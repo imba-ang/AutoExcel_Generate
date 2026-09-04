@@ -1,0 +1,2 @@
+"""AutoExcel Generate web application."""
+

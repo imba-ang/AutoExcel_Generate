@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}教师工作台{% endblock %}
+{% block content %}
+<div class="dashboard-heading">
+  <div><p class="eyebrow">教师端</p><h1>学生提交情况</h1></div>
+  <div class="toolbar">
+    <a class="button button-secondary" href="/teacher/qrcodes">查看二维码</a>
+    <a class="button button-primary" href="/teacher/download-all">批量下载</a>
+    <form method="post" action="/teacher/logout"><button class="text-button" type="submit">退出</button></form>
+  </div>
+</div>
+
+{% if insecure_defaults %}
+<p class="message message-warning">当前仍使用开发环境密码或临时会话密钥。公网部署前请按 README 设置安全参数。</p>
+{% endif %}
+
+<form class="filters" method="get" action="/teacher">
+  <input name="q" value="{{ query }}" placeholder="搜索姓名或学号">
+  <select name="status">
+    <option value="all" {% if status == 'all' %}selected{% endif %}>全部学生</option>
+    {% for item in sections %}
+    <option value="{{ item.slug }}" {% if status == item.slug %}selected{% endif %}>已提交“{{ item.label }}”</option>
+    <option value="missing-{{ item.slug }}" {% if status == 'missing-' ~ item.slug %}selected{% endif %}>未提交“{{ item.label }}”</option>
+    {% endfor %}
+  </select>
+  <button class="button button-secondary" type="submit">筛选</button>
+</form>
+
+<div class="table-card">
+  <table class="dashboard-table">
+    <thead><tr><th>姓名</th><th>学号</th><th>破</th><th>扩</th><th>筛</th><th>最近提交</th><th>下载</th></tr></thead>
+    <tbody>
+    {% for student in students %}
+      <tr>
+        <td>{{ student.student_name }}</td>
+        <td>{{ student.student_id }}</td>
+        {% for item in sections %}
+        <td>
+          {% if student[item.slug ~ '_updated_at'] %}
+          <a class="status status-done" href="/teacher/student/{{ student.student_id }}/{{ item.slug }}">已提交</a>
+          {% else %}<span class="status status-missing">未提交</span>{% endif %}
+        </td>
+        {% endfor %}
+        <td class="date-cell">{{ student.latest_updated_at|display_time }}</td>
+        <td><a href="/teacher/download/{{ student.student_id }}">Excel</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="empty-state">暂无符合条件的学生记录</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

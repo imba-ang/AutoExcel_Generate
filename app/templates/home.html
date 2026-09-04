@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}创意有方 4·4·4{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">4·4·4 工具单</p>
+  <h1>从问题出发，形成值得行动的创新方案</h1>
+  <p>依次完成“破、扩、筛”三个环节。每个入口会保存到同一学号名下。</p>
+</section>
+<section class="section-cards">
+  {% for item in sections %}
+  <a class="section-card section-{{ item.slug }}" href="/student/{{ item.slug }}">
+    <span class="section-number">0{{ loop.index }}</span>
+    <strong>{{ item.label }}</strong>
+    <span>{{ item.subtitle }}</span>
+  </a>
+  {% endfor %}
+</section>
+<p class="teacher-entry"><a href="/teacher/login">教师入口</a></p>
+{% endblock %}
+

@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      TEACHER_PASSWORD: ${TEACHER_PASSWORD:-change-me-now}
+      SESSION_SECRET: ${SESSION_SECRET:-local-development-secret-change-before-deploy}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      DATA_DIR: /data
+    volumes:
+      - autoexcel-data:/data
+
+volumes:
+  autoexcel-data:
+

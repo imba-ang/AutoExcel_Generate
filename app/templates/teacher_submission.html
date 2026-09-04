@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ student.student_name }}｜{{ section.label }}{% endblock %}
+{% block content %}
+<div class="dashboard-heading">
+  <div>
+    <p class="eyebrow">{{ student.student_id }} · {{ student.student_name }}</p>
+    <h1>{{ section.label }}｜{{ section.subtitle }}</h1>
+  </div>
+  <div class="toolbar">
+    <a class="button button-secondary" href="/teacher">返回列表</a>
+    <a class="button button-primary" href="/teacher/download/{{ student.student_id }}">下载完整 Excel</a>
+  </div>
+</div>
+<section class="sheet-panel">
+  <div class="sheet-scroll">
+    <table class="excel-grid readonly-grid">
+      <colgroup>{% for width in column_widths %}<col style="width:{{ width }}px">{% endfor %}</colgroup>
+      <tbody>
+      {% for row in rows %}
+      <tr style="height:{{ row.height_px }}px">
+        {% for cell in row.cells %}
+        <td colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}" style="{{ cell.style }}"><span class="cell-value">{{ cell.value }}</span></td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

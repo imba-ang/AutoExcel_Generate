@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}教师登录{% endblock %}
+{% block content %}
+<section class="login-card">
+  <p class="eyebrow">教师端</p>
+  <h1>登录查看学生提交</h1>
+  {% if error %}<p class="message message-error">{{ error }}</p>{% endif %}
+  <form method="post" action="/teacher/login">
+    <label>教师密码<input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="button button-primary" type="submit">登录</button>
+  </form>
+</section>
+{% endblock %}
+
