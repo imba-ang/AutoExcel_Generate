@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -176,6 +177,9 @@ class ExcelTemplate:
                 display_value = answer if editable and answer else value
                 if editable and coordinate in PROMPT_PREFIX_CELLS and readonly and answer:
                     display_value = f"{value}{answer}"
+                style = cell_css(cell)
+                if not editable and cell.value is not None:
+                    style = f"{style};text-align:center;vertical-align:middle"
                 rendered_cells.append(
                     {
                         "coordinate": coordinate,
@@ -186,7 +190,7 @@ class ExcelTemplate:
                         "formula_source": formula_source,
                         "colspan": (merged.max_col - merged.min_col + 1) if merged else 1,
                         "rowspan": (merged.max_row - merged.min_row + 1) if merged else 1,
-                        "style": cell_css(cell),
+                        "style": style,
                     }
                 )
             height = self.worksheet.row_dimensions[row_number].height or 22
@@ -215,6 +219,16 @@ class ExcelTemplate:
                     worksheet[coordinate] = f"{original}{answer}"
                 else:
                     worksheet[coordinate] = answer
+        for spec in SECTIONS.values():
+            for row_number in range(spec.start_row, spec.end_row + 1):
+                for column in range(1, worksheet.max_column + 1):
+                    cell = worksheet.cell(row_number, column)
+                    if cell.coordinate in spec.editable_cells or cell.value is None:
+                        continue
+                    alignment = copy(cell.alignment)
+                    alignment.horizontal = "center"
+                    alignment.vertical = "center"
+                    cell.alignment = alignment
         try:
             workbook.calculation.fullCalcOnLoad = True
             workbook.calculation.forceFullCalc = True
@@ -224,4 +238,3 @@ class ExcelTemplate:
         workbook.save(output)
         output.seek(0)
         return output
-

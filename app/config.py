@@ -17,6 +17,7 @@ class Settings:
     session_secret: str
     public_base_url: str | None
     cookie_secure: bool
+    qr_base_url: str | None = None
 
     @property
     def db_path(self) -> Path:
@@ -33,6 +34,7 @@ class Settings:
             os.getenv("EXCEL_TEMPLATE_PATH", BASE_DIR / "app" / "assets" / "template.xlsx")
         ).expanduser().resolve()
         public_base_url = os.getenv("PUBLIC_BASE_URL", "").strip().rstrip("/") or None
+        qr_base_url = os.getenv("QR_BASE_URL", "").strip().rstrip("/") or None
         return cls(
             data_dir=data_dir,
             template_path=template_path,
@@ -40,5 +42,5 @@ class Settings:
             session_secret=os.getenv("SESSION_SECRET", secrets.token_urlsafe(32)),
             public_base_url=public_base_url,
             cookie_secure=os.getenv("COOKIE_SECURE", "false").lower() in {"1", "true", "yes"},
+            qr_base_url=qr_base_url,
         )
-

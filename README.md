@@ -25,6 +25,7 @@ uv sync --extra dev
 export TEACHER_PASSWORD='请设置教师密码'
 export SESSION_SECRET='请设置至少32位随机字符串'
 export PUBLIC_BASE_URL='http://localhost:8000'
+export QR_BASE_URL='http://localhost:8000'
 export COOKIE_SECURE='false'
 uv run uvicorn app.main:app --reload
 ```
@@ -44,13 +45,14 @@ docker compose up --build
 该项目可部署到支持 Docker 和持久化磁盘的平台或学校服务器。公网部署必须满足：
 
 1. 使用固定 HTTPS 域名，并将 `PUBLIC_BASE_URL` 设置为该域名，例如 `https://innovation.example.edu`。
-2. 设置强 `TEACHER_PASSWORD`。
-3. 设置至少 32 位随机 `SESSION_SECRET`。
-4. 设置 `COOKIE_SECURE=true`。
-5. 将 `/data` 挂载到持久化磁盘；否则服务器重启可能丢失学生提交。
-6. 备份 `/data/submissions.db`。
+2. 如需微信直接扫码访问国内镜像，将 `QR_BASE_URL` 设置为镜像域名，例如 `https://innovation.example.cn`；二维码会统一使用该地址，网页自身仍可保留 `PUBLIC_BASE_URL`。
+3. 设置强 `TEACHER_PASSWORD`。
+4. 设置至少 32 位随机 `SESSION_SECRET`。
+5. 设置 `COOKIE_SECURE=true`。
+6. 将 `/data` 挂载到持久化磁盘；否则服务器重启可能丢失学生提交。
+7. 备份 `/data/submissions.db`。
 
-`PUBLIC_BASE_URL` 确定后，教师端生成的三个二维码可长期使用。更换域名后需要重新下载二维码。
+`QR_BASE_URL`（未设置时回退到 `PUBLIC_BASE_URL`）确定后，教师端生成的三个二维码可长期使用。更换域名后需要重新下载二维码。
 
 ## 数据与模板
 
@@ -64,4 +66,3 @@ docker compose up --build
 ```bash
 uv run pytest -q
 ```
-

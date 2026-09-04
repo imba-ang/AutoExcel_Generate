@@ -24,6 +24,7 @@ def make_client(tmp_path: Path) -> TestClient:
         session_secret="test-secret-that-is-longer-than-32-characters",
         public_base_url="https://forms.example.edu",
         cookie_secure=False,
+        qr_base_url="https://forms.example.cn",
     )
     return TestClient(create_app(settings))
 
@@ -39,6 +40,18 @@ def test_student_can_submit_load_and_overwrite(tmp_path: Path):
         assert page.status_code == 200
         assert "四问破题" in page.text
         assert 'data-cell="E10"' in page.text
+        assert '>提交</button>' in page.text
+        assert "提交破表" not in page.text
+        for section in ("po", "kuo", "shai"):
+            fixed_cells = [
+                cell
+                for row in client.app.state.excel_template.render_rows(section)
+                for cell in row["cells"]
+                if not cell["editable"] and cell["value"]
+            ]
+            assert fixed_cells
+            assert all("text-align:center" in cell["style"] for cell in fixed_cells)
+            assert all("vertical-align:middle" in cell["style"] for cell in fixed_cells)
 
         payload = {
             "student_name": "张三",
@@ -103,9 +116,8 @@ def test_teacher_views_and_downloads_original_template_shape(tmp_path: Path):
         assert sheet.max_row == 42
         assert sheet.max_column == 7
         assert "A1:G2" in {str(item) for item in sheet.merged_cells.ranges}
-        assert sheet["A9"].style_id == load_workbook(
-            BASE_DIR / "app" / "assets" / "template.xlsx"
-        )["4·4·4创新方案生成表"]["A9"].style_id
+        assert sheet["A9"].alignment.horizontal == "center"
+        assert sheet["A9"].alignment.vertical == "center"
         assert sheet["C14"].value == "我真正值得解决的问题是：如何减少食堂排队时间？"
         assert str(sheet["A31"].value).startswith("=IF(")
 
@@ -115,17 +127,24 @@ def test_teacher_views_and_downloads_original_template_shape(tmp_path: Path):
             assert any(name.endswith("_创新方案.xlsx") for name in archive.namelist())
 
 
-def test_qrcode_uses_configured_public_url(tmp_path: Path):
+def test_qrcode_uses_configured_domestic_mirror_url(tmp_path: Path):
     with make_client(tmp_path) as client:
         login(client)
         page = client.get("/teacher/qrcodes")
-        assert "https://forms.example.edu/student/po" in page.text
+        assert "https://forms.example.cn/student/po" in page.text
+        targets: list[str] = []
+
+        def make_qr(target: str):
+            targets.append(target)
+            return Image.new("1", (128, 128), color=1)
+
         sys.modules["qrcode"] = types.SimpleNamespace(
-            make=lambda _: Image.new("1", (128, 128), color=1)
+            make=make_qr
         )
         image = client.get("/teacher/qrcode/po.png")
         assert image.status_code == 200
         assert image.headers["content-type"] == "image/png"
+        assert targets == ["https://forms.example.cn/student/po"]
 
 
 def test_twenty_students_can_save_concurrently(tmp_path: Path):

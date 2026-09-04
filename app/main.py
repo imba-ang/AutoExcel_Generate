@@ -85,8 +85,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             return None
         return RedirectResponse(url="/teacher/login", status_code=303)
 
-    def public_base_url(request: Request) -> str:
-        return config.public_base_url or str(request.base_url).rstrip("/")
+    def qr_base_url(request: Request) -> str:
+        return config.qr_base_url or config.public_base_url or str(request.base_url).rstrip("/")
 
     def template_context(request: Request, **extra):
         return {
@@ -284,7 +284,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redirect = teacher_redirect(request)
         if redirect:
             return redirect
-        base_url = public_base_url(request)
+        base_url = qr_base_url(request)
         qr_items = [
             {
                 "section": spec,
@@ -308,7 +308,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="表格类型不存在。")
         import qrcode
 
-        target = f"{public_base_url(request)}/student/{section}"
+        target = f"{qr_base_url(request)}/student/{section}"
         image = qrcode.make(target)
         output = io.BytesIO()
         image.save(output, format="PNG")
