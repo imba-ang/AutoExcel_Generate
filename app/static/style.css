@@ -52,7 +52,9 @@ input, select { min-height: 42px; padding: 9px 12px; border: 1px solid #bac5cf; 
 .sheet-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .excel-grid { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; background: white; }
 .excel-grid td { position: relative; padding: 7px 9px; overflow: hidden; line-height: 1.35; }
-.cell-value, .cell-prompt { white-space: pre-wrap; }
+.fixed-cell { padding-left: 0 !important; padding-right: 0 !important; text-align: center !important; text-indent: 0 !important; }
+.fixed-text { width: 100%; display: block; margin-left: 0; padding-left: 0; text-align: center !important; text-indent: 0 !important; }
+.cell-value, .cell-prompt, .cell-answer { white-space: pre-wrap; }
 .cell-prompt { display: block; margin-bottom: 4px; }
 .cell-input { width: 100%; min-height: 42px; padding: 6px 7px; resize: vertical; border: 1px dashed #7da5c1; border-radius: 5px; color: #152d3e; background: rgba(255,255,255,.88); font: inherit; line-height: 1.35; }
 .cell-input:focus { outline: 2px solid rgba(35, 87, 127, .25); border-color: var(--primary); }
@@ -88,4 +90,3 @@ input, select { min-height: 42px; padding: 9px 12px; border: 1px solid #bac5cf; 
   .table-card { overflow-x: auto; }
   .dashboard-table { min-width: 820px; }
 }
-

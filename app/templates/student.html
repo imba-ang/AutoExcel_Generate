@@ -25,14 +25,15 @@
       {% for row in rows %}
         <tr style="height:{{ row.height_px }}px">
         {% for cell in row.cells %}
-          <td colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}" style="{{ cell.style }}"
+          <td class="{% if cell.input_cell %}input-cell{% else %}fixed-cell{% endif %}"
+              colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}" style="{{ cell.style }}"
               data-coordinate="{{ cell.coordinate }}"
               {% if cell.formula_source %}data-formula-source="{{ cell.formula_source }}" data-default="{{ cell.value }}"{% endif %}>
             {% if cell.editable %}
-              {% if cell.prompt %}<span class="cell-prompt">{{ cell.prompt }}</span>{% endif %}
+              {% if cell.prompt %}<span class="cell-prompt fixed-text">{{ cell.prompt }}</span>{% endif %}
               <textarea class="cell-input" data-cell="{{ cell.coordinate }}" aria-label="{{ cell.coordinate }} 填写内容" placeholder="请填写">{{ cell.answer }}</textarea>
             {% else %}
-              <span class="cell-value">{{ cell.value }}</span>
+              <span class="cell-value fixed-text">{{ cell.value }}</span>
             {% endif %}
           </td>
         {% endfor %}

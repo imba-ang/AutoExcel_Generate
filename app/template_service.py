@@ -179,7 +179,10 @@ class ExcelTemplate:
                     display_value = f"{value}{answer}"
                 style = cell_css(cell)
                 if not editable and cell.value is not None:
-                    style = f"{style};text-align:center;vertical-align:middle"
+                    style = (
+                        f"{style};padding-left:0;padding-right:0;text-indent:0;"
+                        "text-align:center;vertical-align:middle"
+                    )
                 rendered_cells.append(
                     {
                         "coordinate": coordinate,
@@ -187,6 +190,7 @@ class ExcelTemplate:
                         "prompt": prompt,
                         "answer": answer,
                         "editable": editable and not readonly,
+                        "input_cell": editable,
                         "formula_source": formula_source,
                         "colspan": (merged.max_col - merged.min_col + 1) if merged else 1,
                         "rowspan": (merged.max_row - merged.min_row + 1) if merged else 1,
@@ -219,16 +223,21 @@ class ExcelTemplate:
                     worksheet[coordinate] = f"{original}{answer}"
                 else:
                     worksheet[coordinate] = answer
-        for spec in SECTIONS.values():
-            for row_number in range(spec.start_row, spec.end_row + 1):
-                for column in range(1, worksheet.max_column + 1):
-                    cell = worksheet.cell(row_number, column)
-                    if cell.coordinate in spec.editable_cells or cell.value is None:
-                        continue
-                    alignment = copy(cell.alignment)
-                    alignment.horizontal = "center"
-                    alignment.vertical = "center"
-                    cell.alignment = alignment
+        editable_coordinates = {
+            coordinate
+            for spec in SECTIONS.values()
+            for coordinate in spec.editable_cells
+        }
+        for row in worksheet.iter_rows():
+            for cell in row:
+                if cell.coordinate in editable_coordinates or cell.value is None:
+                    continue
+                alignment = copy(cell.alignment)
+                alignment.horizontal = "center"
+                alignment.vertical = "center"
+                alignment.indent = 0
+                alignment.relativeIndent = 0
+                cell.alignment = alignment
         try:
             workbook.calculation.fullCalcOnLoad = True
             workbook.calculation.forceFullCalc = True

@@ -42,6 +42,8 @@ def test_student_can_submit_load_and_overwrite(tmp_path: Path):
         assert 'data-cell="E10"' in page.text
         assert '>提交</button>' in page.text
         assert "提交破表" not in page.text
+        assert 'class="fixed-cell"' in page.text
+        assert 'class="cell-value fixed-text"' in page.text
         for section in ("po", "kuo", "shai"):
             fixed_cells = [
                 cell
@@ -118,6 +120,8 @@ def test_teacher_views_and_downloads_original_template_shape(tmp_path: Path):
         assert "A1:G2" in {str(item) for item in sheet.merged_cells.ranges}
         assert sheet["A9"].alignment.horizontal == "center"
         assert sheet["A9"].alignment.vertical == "center"
+        assert sheet["A9"].alignment.indent == 0
+        assert sheet["A9"].alignment.relativeIndent == 0
         assert sheet["C14"].value == "我真正值得解决的问题是：如何减少食堂排队时间？"
         assert str(sheet["A31"].value).startswith("=IF(")
 
