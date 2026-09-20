@@ -78,6 +78,17 @@ def test_student_can_submit_load_and_overwrite(tmp_path: Path):
         assert loaded.status_code == 200
         assert loaded.json()["answers"] == {"E10": "修改后的答案"}
 
+        cors = client.options(
+            "/api/submissions/po",
+            headers={
+                "Origin": "https://imba-ang.github.io",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type",
+            },
+        )
+        assert cors.status_code == 200
+        assert cors.headers["access-control-allow-origin"] == "https://imba-ang.github.io"
+
         starting_page = client.get("/student/qidian")
         assert starting_page.status_code == 200
         assert "先留下第一反应" in starting_page.text

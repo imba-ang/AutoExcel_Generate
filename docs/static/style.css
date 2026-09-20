@@ -1,0 +1,144 @@
+:root {
+  --ink: #183044;
+  --muted: #647383;
+  --paper: #ffffff;
+  --page: #f3f6f8;
+  --line: #d8dee4;
+  --primary: #23577f;
+  --qidian: #edf1f4;
+  --po: #d9ebf7;
+  --kuo: #e2f0d9;
+  --shai: #fce4d6;
+  --shadow: 0 16px 40px rgba(31, 49, 66, .08);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--page); font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; }
+a { color: #1d5f8c; }
+.site-header { height: 64px; padding: 0 5vw; display: flex; align-items: center; gap: 14px; background: #1d4f77; color: white; }
+.brand { color: white; text-decoration: none; font-weight: 800; font-size: 20px; }
+.brand-note { opacity: .76; font-size: 14px; }
+.page-shell { width: min(1180px, 92vw); margin: 42px auto 80px; }
+.hero { max-width: 760px; margin: 70px 0 38px; }
+.hero h1, .form-heading h1, .dashboard-heading h1, .login-card h1 { margin: 6px 0 14px; font-size: clamp(30px, 5vw, 52px); line-height: 1.16; }
+.hero p, .form-heading p, .dashboard-heading p { color: var(--muted); line-height: 1.8; }
+.eyebrow { margin: 0; color: #2b6f9e !important; font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.section-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.section-card { min-height: 210px; padding: 24px; border-radius: 20px; display: flex; flex-direction: column; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: transform .18s ease; }
+.section-card:hover { transform: translateY(-3px); }
+.section-card strong { margin-top: auto; font-size: 46px; }
+.section-card span:last-child { margin-top: 6px; }
+.section-number { font-weight: 800; opacity: .5; }
+.section-qidian { background: var(--qidian); }
+.section-po { background: var(--po); }
+.section-kuo { background: var(--kuo); }
+.section-shai { background: var(--shai); }
+.teacher-entry { margin-top: 28px; text-align: right; }
+.form-heading { padding: 26px 30px; margin-bottom: 22px; border-radius: 18px; }
+.form-heading h1 { font-size: clamp(28px, 4vw, 42px); }
+.identity-card, .filters { display: flex; align-items: end; gap: 16px; padding: 20px; margin-bottom: 18px; background: white; border-radius: 14px; box-shadow: var(--shadow); }
+label { display: grid; gap: 7px; font-size: 14px; font-weight: 700; }
+input, select { min-height: 42px; padding: 9px 12px; border: 1px solid #bac5cf; border-radius: 8px; color: var(--ink); background: white; font: inherit; }
+.identity-card label { flex: 1; }
+.button { min-height: 42px; padding: 10px 18px; border: 0; border-radius: 9px; display: inline-flex; justify-content: center; align-items: center; font: inherit; font-weight: 750; text-decoration: none; cursor: pointer; }
+.button:disabled { opacity: .55; cursor: wait; }
+.button-primary { color: white; background: var(--primary); }
+.button-secondary { color: var(--ink); background: #e8eef3; }
+.text-button { border: 0; color: #596978; background: transparent; cursor: pointer; }
+.message { min-height: 24px; margin: 10px 2px; padding: 0; }
+.message-success, .message-error, .message-warning { padding: 12px 14px; border-radius: 9px; }
+.message-success { color: #235b37; background: #e5f4e9; }
+.message-error { color: #8b2e2e; background: #fde8e8; }
+.message-warning { color: #714f16; background: #fff3cf; }
+.sheet-panel, .table-card { padding: 18px; background: white; border-radius: 16px; box-shadow: var(--shadow); }
+.sheet-tabbar { min-height: 46px; margin: -18px -18px 0; padding: 0 16px; display: flex; align-items: center; gap: 14px; color: #1f2429; background: #f4f5f7; border-bottom: 1px solid #d7dce1; }
+.sheet-tabbar strong { padding: 12px 20px; background: white; border-left: 1px solid #d7dce1; border-right: 1px solid #d7dce1; }
+.sheet-stack { font-size: 24px; transform: rotate(45deg); }
+.sheet-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.excel-grid { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; background: white; }
+.row-number-column { width: 40px; }
+.excel-grid th { font-weight: 400; }
+.sheet-corner, .sheet-column, .sheet-row { color: #3f464d; background: #f3f5f7; border: 1px solid #d9dde1; font-size: 12px; text-align: center; }
+.sheet-corner { height: 28px; }
+.sheet-row { width: 40px; padding: 0 4px; }
+.excel-grid td { position: relative; padding: 7px 9px; overflow: hidden; line-height: 1.35; }
+.fixed-cell { padding-left: 0 !important; padding-right: 0 !important; text-align: center !important; text-indent: 0 !important; }
+.fixed-text { width: 100%; display: block; margin-left: 0; padding-left: 0; text-align: center !important; text-indent: 0 !important; }
+.cell-value, .cell-prompt, .cell-answer { white-space: pre-wrap; }
+.cell-prompt { display: block; margin-bottom: 4px; }
+.cell-input { width: 100%; min-height: 42px; padding: 6px 7px; resize: vertical; border: 1px dashed #7da5c1; border-radius: 5px; color: #152d3e; background: rgba(255,255,255,.88); font: inherit; line-height: 1.35; }
+.cell-input:focus { outline: 2px solid rgba(35, 87, 127, .25); border-color: var(--primary); }
+.submit-bar { position: sticky; bottom: 14px; z-index: 3; margin-top: 18px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 20px; color: var(--muted); background: rgba(255,255,255,.95); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+.dashboard-heading { margin-bottom: 24px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.dashboard-heading h1 { font-size: clamp(30px, 4vw, 44px); }
+.toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.filters input { min-width: 240px; flex: 1; }
+.dashboard-table { width: 100%; border-collapse: collapse; }
+.dashboard-table th, .dashboard-table td { padding: 13px 12px; border-bottom: 1px solid #e3e8ec; text-align: left; }
+.dashboard-table th { color: white; background: #274e6a; font-size: 13px; }
+.status { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 12px; text-decoration: none; }
+.status-done { color: #215b36; background: #ddf1e3; }
+.status-missing { color: #6b7480; background: #edf0f2; }
+.date-cell { max-width: 180px; color: var(--muted); font-size: 12px; }
+.empty-state { padding: 42px !important; color: var(--muted); text-align: center !important; }
+.login-card { width: min(440px, 100%); margin: 90px auto; padding: 34px; background: white; border-radius: 18px; box-shadow: var(--shadow); }
+.login-card h1 { font-size: 34px; }
+.login-card form { display: grid; gap: 18px; }
+.qr-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.qr-card { padding: 24px; display: grid; justify-items: center; gap: 16px; border-radius: 18px; box-shadow: var(--shadow); }
+.qr-card img { width: min(250px, 100%); background: white; border-radius: 10px; }
+.qr-card code { max-width: 100%; overflow-wrap: anywhere; font-size: 12px; }
+
+@media (max-width: 760px) {
+  .site-header { height: 52px; padding: 0 14px; }
+  .brand { font-size: 17px; }
+  .brand-note { font-size: 12px; }
+  .page-shell { width: 100%; margin: 0 0 84px; }
+  .hero, .section-cards, .teacher-entry, .dashboard-heading, .filters, .table-card, .login-card, .qr-grid { margin-right: 12px; margin-left: 12px; }
+  .section-cards, .qr-grid { grid-template-columns: 1fr; }
+  .section-card { min-height: 160px; }
+  .form-heading { margin: 0; padding: 18px 16px 14px; border-radius: 0; text-align: center; }
+  .form-heading h1 { margin: 3px 0 6px; font-size: 24px; }
+  .form-heading p:last-child { margin: 0; font-size: 12px; line-height: 1.5; }
+  .identity-card { margin: 0; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--line); }
+  .identity-card label { width: 100%; gap: 4px; font-size: 12px; }
+  .identity-card input { width: 100%; min-width: 0; min-height: 38px; }
+  .identity-card .button { grid-column: 1 / -1; min-height: 38px; }
+  .filters { align-items: stretch; flex-direction: column; }
+  .filters input { width: 100%; }
+  .message { margin: 0; min-height: 0; }
+  .message-success, .message-error, .message-warning { margin: 8px 12px; }
+  .sheet-panel { padding: 0; border-radius: 0; box-shadow: none; }
+  .sheet-tabbar { min-height: 46px; margin: 0; }
+  .sheet-scroll { overflow-x: hidden; }
+  .excel-grid { width: 100%; min-width: 0; display: block; font-size: 11px; }
+  .excel-grid colgroup { display: none; }
+  .excel-grid thead, .excel-grid tbody { display: block; }
+  .excel-grid thead tr, .excel-grid tbody tr { width: 100%; display: grid; grid-template-columns: 6.9% repeat(7, 13.3%); }
+  .excel-grid tbody tr { height: auto !important; min-height: var(--row-height); }
+  .excel-grid th, .excel-grid td { display: flex; align-items: center; }
+  .excel-grid td[colspan="2"] { grid-column: span 2; }
+  .excel-grid td[colspan="3"] { grid-column: span 3; }
+  .excel-grid td[colspan="4"] { grid-column: span 4; }
+  .excel-grid td[colspan="5"] { grid-column: span 5; }
+  .excel-grid td[colspan="6"] { grid-column: span 6; }
+  .excel-grid td[colspan="7"] { grid-column: span 7; }
+  .row-number-column { width: auto; }
+  .sheet-corner { height: 25px; }
+  .sheet-corner, .sheet-column, .sheet-row { justify-content: center; }
+  .sheet-row { width: auto; padding: 0 2px; font-size: 10px; }
+  .excel-grid td { padding: 5px 4px; line-height: 1.28; }
+  .fixed-cell { padding-left: 3px !important; padding-right: 3px !important; }
+  .input-cell { padding: 0 !important; }
+  .cell-editor { width: 100%; min-height: 42px; display: flex; align-items: stretch; }
+  .cell-editor-with-prompt .cell-prompt { width: 58%; margin: 0; padding: 5px 2px 5px 5px; display: flex; align-items: center; }
+  .cell-input { position: static; width: 100%; height: 42px; min-width: 0; min-height: 42px; padding: 5px; flex: 1 1 auto; resize: none; border: 0; border-radius: 0; background: #fff; font-size: 12px; }
+  .cell-editor-with-prompt .cell-input { width: 42%; }
+  .cell-input:focus { outline: 2px solid #2d74da; outline-offset: -2px; }
+  .submit-bar, .dashboard-heading { align-items: stretch; flex-direction: column; }
+  .submit-bar { position: fixed; right: 10px; bottom: 10px; left: 10px; margin: 0; padding: 9px; border-radius: 12px; }
+  .submit-bar span { display: none; }
+  .submit-bar .button { width: 100%; }
+  .table-card { overflow-x: auto; }
+  .dashboard-table { min-width: 820px; }
+}

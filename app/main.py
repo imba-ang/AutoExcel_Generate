@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -73,6 +74,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
 
     app = FastAPI(title="创意有方在线填写", lifespan=lifespan)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["https://imba-ang.github.io"],
+        allow_methods=["POST"],
+        allow_headers=["Content-Type"],
+    )
     app.state.settings = config
     app.state.excel_template = excel_template
     app.mount("/static", StaticFiles(directory=str(BASE_DIR / "app" / "static")), name="static")
