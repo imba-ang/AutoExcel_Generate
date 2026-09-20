@@ -23,13 +23,21 @@ class SectionSpec:
 
 
 SECTIONS: dict[str, SectionSpec] = {
+    "qidian": SectionSpec(
+        slug="qidian",
+        label="起点",
+        subtitle="先留下第一反应",
+        start_row=5,
+        end_row=7,
+        editable_cells=("C6", "C7"),
+    ),
     "po": SectionSpec(
         slug="po",
         label="破",
         subtitle="四问破题",
-        start_row=5,
+        start_row=9,
         end_row=14,
-        editable_cells=("C6", "C7", "E10", "E11", "E12", "E13", "C14"),
+        editable_cells=("E10", "E11", "E12", "E13", "C14"),
     ),
     "kuo": SectionSpec(
         slug="kuo",
@@ -198,7 +206,14 @@ class ExcelTemplate:
                     }
                 )
             height = self.worksheet.row_dimensions[row_number].height or 22
-            rows.append({"number": row_number, "height_px": round(height * 4 / 3), "cells": rendered_cells})
+            rows.append(
+                {
+                    "number": row_number,
+                    "display_number": row_number - spec.start_row + 1,
+                    "height_px": round(height * 4 / 3),
+                    "cells": rendered_cells,
+                }
+            )
         return rows
 
     def column_widths(self) -> list[int]:

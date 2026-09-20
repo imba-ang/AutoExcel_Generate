@@ -12,12 +12,15 @@
   </div>
 </div>
 <section class="sheet-panel">
+  <div class="sheet-tabbar"><span class="sheet-stack" aria-hidden="true">◇</span><strong>{{ section.label }}表</strong></div>
   <div class="sheet-scroll">
     <table class="excel-grid readonly-grid">
-      <colgroup>{% for width in column_widths %}<col style="width:{{ width }}px">{% endfor %}</colgroup>
+      <colgroup><col class="row-number-column">{% for width in column_widths %}<col style="width:{{ width }}px">{% endfor %}</colgroup>
+      <thead><tr><th class="sheet-corner"></th>{% for letter in ['A','B','C','D','E','F','G'] %}<th class="sheet-column">{{ letter }}</th>{% endfor %}</tr></thead>
       <tbody>
       {% for row in rows %}
-      <tr style="height:{{ row.height_px }}px">
+      <tr style="--row-height:{{ row.height_px }}px;height:{{ row.height_px }}px">
+        <th class="sheet-row">{{ row.display_number }}</th>
         {% for cell in row.cells %}
         <td class="{% if cell.input_cell %}input-cell{% else %}fixed-cell{% endif %}"
             colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}" style="{{ cell.style }}">

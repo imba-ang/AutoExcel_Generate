@@ -7,6 +7,23 @@ from pathlib import Path
 from typing import Any
 
 
+SECTION_CHECK = "('qidian', 'po', 'kuo', 'shai')"
+
+
+def submissions_table_sql() -> str:
+    return f"""
+        CREATE TABLE submissions (
+            student_id TEXT NOT NULL,
+            section TEXT NOT NULL CHECK(section IN {SECTION_CHECK}),
+            answers_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (student_id, section),
+            FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+        );
+    """
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
@@ -32,17 +49,56 @@ def init_db(db_path: Path) -> None:
                 updated_at TEXT NOT NULL
             );
 
-            CREATE TABLE IF NOT EXISTS submissions (
-                student_id TEXT NOT NULL,
-                section TEXT NOT NULL CHECK(section IN ('po', 'kuo', 'shai')),
-                answers_json TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL,
-                PRIMARY KEY (student_id, section),
-                FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
-            );
             """
         )
+        table = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'submissions'"
+        ).fetchone()
+        if table is None:
+            connection.executescript(submissions_table_sql())
+        elif "qidian" not in table["sql"]:
+            connection.executescript(
+                f"""
+                ALTER TABLE submissions RENAME TO submissions_legacy;
+                {submissions_table_sql()}
+                INSERT INTO submissions
+                    (student_id, section, answers_json, created_at, updated_at)
+                SELECT student_id, section, answers_json, created_at, updated_at
+                FROM submissions_legacy;
+                DROP TABLE submissions_legacy;
+                """
+            )
+
+        # Older versions stored the two starting answers inside the “破” record.
+        # Preserve those answers by creating the new independent starting record once.
+        legacy_rows = connection.execute(
+            """
+            SELECT student_id, answers_json, created_at, updated_at
+            FROM submissions
+            WHERE section = 'po'
+            """
+        ).fetchall()
+        for row in legacy_rows:
+            answers = json.loads(row["answers_json"])
+            starting_answers = {
+                coordinate: answers[coordinate]
+                for coordinate in ("C6", "C7")
+                if coordinate in answers
+            }
+            if starting_answers:
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO submissions
+                        (student_id, section, answers_json, created_at, updated_at)
+                    VALUES (?, 'qidian', ?, ?, ?)
+                    """,
+                    (
+                        row["student_id"],
+                        json.dumps(starting_answers, ensure_ascii=False),
+                        row["created_at"],
+                        row["updated_at"],
+                    ),
+                )
 
 
 def save_submission(
@@ -135,6 +191,7 @@ def list_students(db_path: Path) -> list[dict[str, Any]]:
             SELECT
                 s.student_id,
                 s.student_name,
+                MAX(CASE WHEN sub.section = 'qidian' THEN sub.updated_at END) AS qidian_updated_at,
                 MAX(CASE WHEN sub.section = 'po' THEN sub.updated_at END) AS po_updated_at,
                 MAX(CASE WHEN sub.section = 'kuo' THEN sub.updated_at END) AS kuo_updated_at,
                 MAX(CASE WHEN sub.section = 'shai' THEN sub.updated_at END) AS shai_updated_at,
@@ -146,4 +203,3 @@ def list_students(db_path: Path) -> list[dict[str, Any]]:
             """
         ).fetchall()
     return [dict(row) for row in rows]
-

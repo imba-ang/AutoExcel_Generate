@@ -2,7 +2,7 @@
 {% block title %}{{ section.label }}｜{{ section.subtitle }}{% endblock %}
 {% block content %}
 <section class="form-heading section-{{ section.slug }}">
-  <p class="eyebrow">第 {{ {'po':'一','kuo':'二','shai':'三'}[section.slug] }} 阶段</p>
+  <p class="eyebrow">{{ {'qidian':'准备阶段','po':'第一阶段','kuo':'第二阶段','shai':'第三阶段'}[section.slug] }}</p>
   <h1>{{ section.label }}｜{{ section.subtitle }}</h1>
   <p>填写姓名和学号后可读取之前的内容；再次提交会覆盖原结果。</p>
 </section>
@@ -16,22 +16,36 @@
 <div id="message" class="message" role="status" aria-live="polite"></div>
 
 <section class="sheet-panel">
+  <div class="sheet-tabbar">
+    <span class="sheet-stack" aria-hidden="true">◇</span>
+    <strong>{{ section.label }}表</strong>
+  </div>
   <div class="sheet-scroll">
     <table class="excel-grid" data-section="{{ section.slug }}">
       <colgroup>
+        <col class="row-number-column">
         {% for width in column_widths %}<col style="width:{{ width }}px">{% endfor %}
       </colgroup>
+      <thead>
+        <tr>
+          <th class="sheet-corner"></th>
+          {% for letter in ['A','B','C','D','E','F','G'] %}<th class="sheet-column">{{ letter }}</th>{% endfor %}
+        </tr>
+      </thead>
       <tbody>
       {% for row in rows %}
-        <tr style="height:{{ row.height_px }}px">
+        <tr style="--row-height:{{ row.height_px }}px;height:{{ row.height_px }}px">
+        <th class="sheet-row">{{ row.display_number }}</th>
         {% for cell in row.cells %}
           <td class="{% if cell.input_cell %}input-cell{% else %}fixed-cell{% endif %}"
               colspan="{{ cell.colspan }}" rowspan="{{ cell.rowspan }}" style="{{ cell.style }}"
               data-coordinate="{{ cell.coordinate }}"
               {% if cell.formula_source %}data-formula-source="{{ cell.formula_source }}" data-default="{{ cell.value }}"{% endif %}>
             {% if cell.editable %}
-              {% if cell.prompt %}<span class="cell-prompt fixed-text">{{ cell.prompt }}</span>{% endif %}
-              <textarea class="cell-input" data-cell="{{ cell.coordinate }}" aria-label="{{ cell.coordinate }} 填写内容" placeholder="请填写">{{ cell.answer }}</textarea>
+              <div class="cell-editor{% if cell.prompt %} cell-editor-with-prompt{% endif %}">
+                {% if cell.prompt %}<span class="cell-prompt fixed-text">{{ cell.prompt }}</span>{% endif %}
+                <textarea class="cell-input" data-cell="{{ cell.coordinate }}" aria-label="{{ cell.coordinate }} 填写内容" placeholder="请填写">{{ cell.answer }}</textarea>
+              </div>
             {% else %}
               <span class="cell-value fixed-text">{{ cell.value }}</span>
             {% endif %}

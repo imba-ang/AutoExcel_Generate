@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import io
+import json
+import sqlite3
 import sys
 import types
 import zipfile
@@ -12,7 +14,7 @@ from openpyxl import load_workbook
 from PIL import Image
 
 from app.config import BASE_DIR, Settings
-from app.db import init_db, list_students, save_submission
+from app.db import init_db, list_students, load_answers, save_submission
 from app.main import create_app
 
 
@@ -36,15 +38,23 @@ def login(client: TestClient) -> None:
 
 def test_student_can_submit_load_and_overwrite(tmp_path: Path):
     with make_client(tmp_path) as client:
+        home = client.get("/")
+        assert home.status_code == 200
+        for path in ("qidian", "po", "kuo", "shai"):
+            assert f'/student/{path}' in home.text
+
         page = client.get("/student/po")
         assert page.status_code == 200
         assert "四问破题" in page.text
         assert 'data-cell="E10"' in page.text
+        assert 'data-cell="C6"' not in page.text
+        assert 'class="sheet-column">A</th>' in page.text
+        assert 'class="sheet-row">1</th>' in page.text
         assert '>提交</button>' in page.text
         assert "提交破表" not in page.text
         assert 'class="fixed-cell"' in page.text
         assert 'class="cell-value fixed-text"' in page.text
-        for section in ("po", "kuo", "shai"):
+        for section in ("qidian", "po", "kuo", "shai"):
             fixed_cells = [
                 cell
                 for row in client.app.state.excel_template.render_rows(section)
@@ -67,6 +77,12 @@ def test_student_can_submit_load_and_overwrite(tmp_path: Path):
         loaded = client.post("/api/submissions/po/load", json={**payload, "answers": {}})
         assert loaded.status_code == 200
         assert loaded.json()["answers"] == {"E10": "修改后的答案"}
+
+        starting_page = client.get("/student/qidian")
+        assert starting_page.status_code == 200
+        assert "先留下第一反应" in starting_page.text
+        assert 'data-cell="C6"' in starting_page.text
+        assert 'data-cell="E10"' not in starting_page.text
 
 
 def test_student_name_must_match_existing_id(tmp_path: Path):
@@ -135,6 +151,8 @@ def test_qrcode_uses_configured_domestic_mirror_url(tmp_path: Path):
     with make_client(tmp_path) as client:
         login(client)
         page = client.get("/teacher/qrcodes")
+        assert page.text.count("下载二维码") == 4
+        assert "https://forms.example.cn/student/qidian" in page.text
         assert "https://forms.example.cn/student/po" in page.text
         targets: list[str] = []
 
@@ -168,3 +186,50 @@ def test_twenty_students_can_save_concurrently(tmp_path: Path):
         list(executor.map(save, range(20)))
 
     assert len(list_students(db_path)) == 20
+
+
+def test_legacy_database_is_upgraded_and_starting_answers_are_preserved(tmp_path: Path):
+    db_path = tmp_path / "legacy.db"
+    timestamp = "2026-09-20T12:00:00+08:00"
+    with sqlite3.connect(db_path) as connection:
+        connection.executescript(
+            """
+            CREATE TABLE students (
+                student_id TEXT PRIMARY KEY,
+                student_name TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE TABLE submissions (
+                student_id TEXT NOT NULL,
+                section TEXT NOT NULL CHECK(section IN ('po', 'kuo', 'shai')),
+                answers_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                PRIMARY KEY (student_id, section),
+                FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+            );
+            """
+        )
+        connection.execute(
+            "INSERT INTO students VALUES (?, ?, ?, ?)",
+            ("20260088", "旧记录", timestamp, timestamp),
+        )
+        connection.execute(
+            "INSERT INTO submissions VALUES (?, 'po', ?, ?, ?)",
+            (
+                "20260088",
+                json.dumps({"C6": "旧问题", "C7": "旧答案", "E10": "事实"}, ensure_ascii=False),
+                timestamp,
+                timestamp,
+            ),
+        )
+
+    init_db(db_path)
+
+    assert load_answers(db_path, "20260088", "qidian") == {
+        "C6": "旧问题",
+        "C7": "旧答案",
+    }
+    save_submission(db_path, "20260088", "旧记录", "qidian", {"C6": "新问题"})
+    assert load_answers(db_path, "20260088", "qidian") == {"C6": "新问题"}

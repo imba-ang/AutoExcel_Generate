@@ -28,7 +28,7 @@
 
 <div class="table-card">
   <table class="dashboard-table">
-    <thead><tr><th>姓名</th><th>学号</th><th>破</th><th>扩</th><th>筛</th><th>最近提交</th><th>下载</th></tr></thead>
+    <thead><tr><th>姓名</th><th>学号</th>{% for item in sections %}<th>{{ item.label }}</th>{% endfor %}<th>最近提交</th><th>下载</th></tr></thead>
     <tbody>
     {% for student in students %}
       <tr>
@@ -45,7 +45,7 @@
         <td><a href="/teacher/download/{{ student.student_id }}">Excel</a></td>
       </tr>
     {% else %}
-      <tr><td colspan="7" class="empty-state">暂无符合条件的学生记录</td></tr>
+      <tr><td colspan="{{ sections|length + 4 }}" class="empty-state">暂无符合条件的学生记录</td></tr>
     {% endfor %}
     </tbody>
   </table>
