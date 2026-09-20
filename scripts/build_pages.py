@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 import tempfile
 import re
+import hashlib
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -16,12 +17,14 @@ PAGES_URL = "https://imba-ang.github.io/AutoExcel_Generate"
 OUTPUT_DIR = BASE_DIR / "docs"
 
 
-def rewrite_links(html: str, section: str | None = None) -> str:
+def rewrite_links(html: str, asset_version: str, section: str | None = None) -> str:
+    style_url = f"{PAGES_PATH}/static/style.css?v={asset_version}"
+    script_url = f"{PAGES_PATH}/static/student.js?v={asset_version}"
     replacements = {
-        'href="/static/style.css"': f'href="{PAGES_PATH}/static/style.css"',
-        'src="/static/student.js"': f'src="{PAGES_PATH}/static/student.js"',
-        'href="http://testserver/static/style.css"': f'href="{PAGES_PATH}/static/style.css"',
-        'src="http://testserver/static/student.js"': f'src="{PAGES_PATH}/static/student.js"',
+        'href="/static/style.css"': f'href="{style_url}"',
+        'src="/static/student.js"': f'src="{script_url}"',
+        'href="http://testserver/static/style.css"': f'href="{style_url}"',
+        'src="http://testserver/static/student.js"': f'src="{script_url}"',
         'href="/"': f'href="{PAGES_PATH}/"',
     }
     for slug in ("qidian", "po", "kuo", "shai"):
@@ -61,8 +64,13 @@ def build() -> None:
     if OUTPUT_DIR.exists():
         shutil.rmtree(OUTPUT_DIR)
     (OUTPUT_DIR / "static").mkdir(parents=True)
-    shutil.copy2(BASE_DIR / "app" / "static" / "style.css", OUTPUT_DIR / "static")
-    shutil.copy2(BASE_DIR / "scripts" / "pages_student.js", OUTPUT_DIR / "static" / "student.js")
+    style_source = BASE_DIR / "app" / "static" / "style.css"
+    script_source = BASE_DIR / "scripts" / "pages_student.js"
+    shutil.copy2(style_source, OUTPUT_DIR / "static")
+    shutil.copy2(script_source, OUTPUT_DIR / "static" / "student.js")
+    asset_version = hashlib.sha256(
+        style_source.read_bytes() + script_source.read_bytes()
+    ).hexdigest()[:12]
     (OUTPUT_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
     with tempfile.TemporaryDirectory(prefix="autoexcel-pages-") as temp_dir:
@@ -79,7 +87,7 @@ def build() -> None:
             home = client.get("/")
             home.raise_for_status()
             (OUTPUT_DIR / "index.html").write_text(
-                rewrite_links(home.text), encoding="utf-8"
+                rewrite_links(home.text, asset_version), encoding="utf-8"
             )
             for section in ("qidian", "po", "kuo", "shai"):
                 response = client.get(f"/student/{section}")
@@ -87,7 +95,7 @@ def build() -> None:
                 target = OUTPUT_DIR / "student" / section
                 target.mkdir(parents=True)
                 (target / "index.html").write_text(
-                    rewrite_links(response.text, section), encoding="utf-8"
+                    rewrite_links(response.text, asset_version, section), encoding="utf-8"
                 )
 
 

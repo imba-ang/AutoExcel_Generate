@@ -7,6 +7,19 @@
   const submitButton = document.querySelector("#submit-form");
   const cellInputs = [...document.querySelectorAll("[data-cell]")];
 
+  function fitSheetToScreen() {
+    const screenWidth = Math.floor(document.documentElement.clientWidth || window.innerWidth);
+    document.documentElement.style.setProperty("--screen-width", `${screenWidth}px`);
+    const scrollArea = table.closest(".sheet-scroll");
+    if (scrollArea) scrollArea.scrollLeft = 0;
+  }
+
+  fitSheetToScreen();
+  requestAnimationFrame(fitSheetToScreen);
+  window.addEventListener("resize", fitSheetToScreen, { passive: true });
+  window.addEventListener("orientationchange", fitSheetToScreen, { passive: true });
+  if (document.fonts?.ready) document.fonts.ready.then(fitSheetToScreen);
+
   function setMessage(text, kind = "info") {
     message.textContent = text;
     message.className = `message ${text ? `message-${kind}` : ""}`;
