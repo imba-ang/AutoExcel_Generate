@@ -13,7 +13,8 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; color: var(--ink); background: var(--page); font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; }
+html { width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { width: 100%; max-width: 100%; margin: 0; overflow-x: hidden; color: var(--ink); background: var(--page); font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; }
 a { color: #1d5f8c; }
 .site-header { height: 64px; padding: 0 5vw; display: flex; align-items: center; gap: 14px; background: #1d4f77; color: white; }
 .brand { color: white; text-decoration: none; font-weight: 800; font-size: 20px; }
@@ -93,7 +94,7 @@ input, select { min-height: 42px; padding: 9px 12px; border: 1px solid #bac5cf; 
   .site-header { height: 52px; padding: 0 14px; }
   .brand { font-size: 17px; }
   .brand-note { font-size: 12px; }
-  .page-shell { width: 100%; margin: 0 0 84px; }
+  .page-shell { width: 100%; max-width: 100%; margin: 0 0 84px; overflow-x: hidden; }
   .hero, .section-cards, .teacher-entry, .dashboard-heading, .filters, .table-card, .login-card, .qr-grid { margin-right: 12px; margin-left: 12px; }
   .section-cards, .qr-grid { grid-template-columns: 1fr; }
   .section-card { min-height: 160px; }
@@ -110,7 +111,7 @@ input, select { min-height: 42px; padding: 9px 12px; border: 1px solid #bac5cf; 
   .message-success, .message-error, .message-warning { margin: 8px 12px; }
   .sheet-panel { padding: 0; border-radius: 0; box-shadow: none; }
   .sheet-tabbar { min-height: 46px; margin: 0; }
-  .sheet-scroll { overflow-x: hidden; }
+  .sheet-scroll { width: 100%; max-width: 100vw; overflow-x: hidden; }
   .excel-grid { width: 100%; min-width: 0; display: block; font-size: 11px; }
   .excel-grid colgroup { display: none; }
   .excel-grid thead, .excel-grid tbody { display: block; }

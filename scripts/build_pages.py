@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
+import re
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -19,6 +20,8 @@ def rewrite_links(html: str, section: str | None = None) -> str:
     replacements = {
         'href="/static/style.css"': f'href="{PAGES_PATH}/static/style.css"',
         'src="/static/student.js"': f'src="{PAGES_PATH}/static/student.js"',
+        'href="http://testserver/static/style.css"': f'href="{PAGES_PATH}/static/style.css"',
+        'src="http://testserver/static/student.js"': f'src="{PAGES_PATH}/static/student.js"',
         'href="/"': f'href="{PAGES_PATH}/"',
     }
     for slug in ("qidian", "po", "kuo", "shai"):
@@ -28,19 +31,28 @@ def rewrite_links(html: str, section: str | None = None) -> str:
     for old, new in replacements.items():
         html = html.replace(old, new)
     if section:
-        html = html.replace(
-            "填写姓名和学号后可读取之前的内容；再次提交会覆盖原结果。",
-            "评委展示版：填写内容只保存在当前浏览器，不会上传。",
+        html = re.sub(
+            r"\s*<section class=\"identity-card\">.*?</section>\s*",
+            "\n",
+            html,
+            flags=re.DOTALL,
         )
-        html = html.replace("读取已提交内容", "读取本机保存内容")
+        html = html.replace(
+            "  <p>填写姓名和学号后可读取之前的内容；再次提交会覆盖原结果。</p>\n",
+            "",
+        )
         html = html.replace(
             "提交后仍可用相同姓名和学号继续修改",
-            "展示模式：内容仅保存在当前浏览器",
+            "提交后可继续修改",
         )
     else:
         html = html.replace(
+            "依次完成“起点、破、扩、筛”四张表。每个入口会保存到同一学号名下。",
+            "依次完成“起点、破、扩、筛”四张表。",
+        )
+        html = html.replace(
             '<p class="teacher-entry"><a href="/teacher/login">教师入口</a></p>',
-            '<p class="teacher-entry"><span>评委展示版 · 数据仅保存在当前浏览器</span></p>',
+            "",
         )
     return html
 
