@@ -16,13 +16,13 @@
 <section class="form-heading section-po">
   <p class="eyebrow">第一阶段</p>
   <h1>破｜四问破题</h1>
-  <p>填写姓名和学号后可读取之前的内容；再次提交会覆盖原结果。</p>
+  <p>评委展示版：填写内容只保存在当前浏览器，不会上传。</p>
 </section>
 
 <section class="identity-card">
   <label>姓名<input id="student-name" maxlength="40" autocomplete="name" placeholder="请输入姓名"></label>
   <label>学号<input id="student-id" maxlength="40" inputmode="text" placeholder="请输入学号"></label>
-  <button type="button" class="button button-secondary" id="load-existing">读取已提交内容</button>
+  <button type="button" class="button button-secondary" id="load-existing">读取本机保存内容</button>
 </section>
 
 <div id="message" class="message" role="status" aria-live="polite"></div>
@@ -33,7 +33,7 @@
     <strong>破表</strong>
   </div>
   <div class="sheet-scroll">
-    <table class="excel-grid" data-section="po" data-api-base="https://autoexcel-generate-production.up.railway.app">
+    <table class="excel-grid" data-section="po">
       <colgroup>
         <col class="row-number-column">
         <col style="width:89px"><col style="width:96px"><col style="width:97px"><col style="width:96px"><col style="width:89px"><col style="width:88px"><col style="width:90px">
@@ -233,7 +233,7 @@
 </section>
 
 <div class="submit-bar">
-  <span>提交后仍可用相同姓名和学号继续修改</span>
+  <span>展示模式：内容仅保存在当前浏览器</span>
   <button type="button" class="button button-primary" id="submit-form">提交</button>
 </div>
 

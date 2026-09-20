@@ -12,7 +12,6 @@ from app.main import create_app
 
 PAGES_PATH = "/AutoExcel_Generate"
 PAGES_URL = "https://imba-ang.github.io/AutoExcel_Generate"
-API_BASE = "https://autoexcel-generate-production.up.railway.app"
 OUTPUT_DIR = BASE_DIR / "docs"
 
 
@@ -21,7 +20,6 @@ def rewrite_links(html: str, section: str | None = None) -> str:
         'href="/static/style.css"': f'href="{PAGES_PATH}/static/style.css"',
         'src="/static/student.js"': f'src="{PAGES_PATH}/static/student.js"',
         'href="/"': f'href="{PAGES_PATH}/"',
-        'href="/teacher/login"': f'href="{API_BASE}/teacher/login"',
     }
     for slug in ("qidian", "po", "kuo", "shai"):
         replacements[f'href="/student/{slug}"'] = (
@@ -31,8 +29,18 @@ def rewrite_links(html: str, section: str | None = None) -> str:
         html = html.replace(old, new)
     if section:
         html = html.replace(
-            f'data-section="{section}"',
-            f'data-section="{section}" data-api-base="{API_BASE}"',
+            "填写姓名和学号后可读取之前的内容；再次提交会覆盖原结果。",
+            "评委展示版：填写内容只保存在当前浏览器，不会上传。",
+        )
+        html = html.replace("读取已提交内容", "读取本机保存内容")
+        html = html.replace(
+            "提交后仍可用相同姓名和学号继续修改",
+            "展示模式：内容仅保存在当前浏览器",
+        )
+    else:
+        html = html.replace(
+            '<p class="teacher-entry"><a href="/teacher/login">教师入口</a></p>',
+            '<p class="teacher-entry"><span>评委展示版 · 数据仅保存在当前浏览器</span></p>',
         )
     return html
 
@@ -42,7 +50,7 @@ def build() -> None:
         shutil.rmtree(OUTPUT_DIR)
     (OUTPUT_DIR / "static").mkdir(parents=True)
     shutil.copy2(BASE_DIR / "app" / "static" / "style.css", OUTPUT_DIR / "static")
-    shutil.copy2(BASE_DIR / "app" / "static" / "student.js", OUTPUT_DIR / "static")
+    shutil.copy2(BASE_DIR / "scripts" / "pages_student.js", OUTPUT_DIR / "static" / "student.js")
     (OUTPUT_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
     with tempfile.TemporaryDirectory(prefix="autoexcel-pages-") as temp_dir:

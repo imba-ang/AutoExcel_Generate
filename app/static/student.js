@@ -3,7 +3,6 @@
   if (!table) return;
 
   const section = table.dataset.section;
-  const apiBase = (table.dataset.apiBase || "").replace(/\/$/, "");
   const nameInput = document.querySelector("#student-name");
   const idInput = document.querySelector("#student-id");
   const message = document.querySelector("#message");
@@ -73,7 +72,7 @@
     loadButton.disabled = true;
     setMessage("正在读取…");
     try {
-      const data = await postJson(`${apiBase}/api/submissions/${section}/load`, { ...current, answers: {} });
+      const data = await postJson(`/api/submissions/${section}/load`, { ...current, answers: {} });
       setAnswers(data.answers || {});
       updateFormulaCells(data.context_answers || {});
       setMessage(data.exists ? "已读取上次提交内容，可以继续修改。" : "未找到旧记录，可以开始填写。", "success");
@@ -90,7 +89,7 @@
     submitButton.disabled = true;
     setMessage("正在提交…");
     try {
-      await postJson(`${apiBase}/api/submissions/${section}`, { ...current, answers: collectAnswers() });
+      await postJson(`/api/submissions/${section}`, { ...current, answers: collectAnswers() });
       setMessage("提交成功。以后可用相同姓名和学号读取并修改。", "success");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {

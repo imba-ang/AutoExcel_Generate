@@ -2,7 +2,7 @@
 
 面向约 20 名学生的在线 Excel 填写系统。学生分别扫描“起点、破、扩、筛”四个固定二维码，在网页中填写原 Excel 工作表对应区域；教师按学号查看四张表的完成情况，并可下载单个学生或全班的 Excel。
 
-学生端同时发布在 GitHub Pages：`https://imba-ang.github.io/AutoExcel_Generate/`。Pages 只负责展示网页，提交记录、教师端和 Excel 下载仍由 Railway 后端提供。
+评委展示版发布在 GitHub Pages：`https://imba-ang.github.io/AutoExcel_Generate/`。该版本完全静态，不连接 Railway；演示填写内容只保存在评委当前浏览器的本地存储中，不会上传。
 
 ## 已实现
 
